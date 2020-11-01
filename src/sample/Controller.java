@@ -31,33 +31,24 @@ public class Controller {
 
     @FXML
     public void onClickChecker(ActionEvent e) throws InterruptedException {
-
         if(e.getSource().equals(Start)){
-
             ArrayList<String> users = new ArrayList<>();
             String username = null;
             String urlFile = "List.txt";
 
-
             try{
+                // read the username from list.txt and add it into ArrayList
                 FileReader fileReader = new FileReader(urlFile);
                 BufferedReader in = new BufferedReader(fileReader);
-
                 while ((username = in.readLine()) != null)
                     users.add(username);
 
-                /*Thread thread;
-                for(String user : users) {
-                    CheckList(user);
-                }
-                */
-
+                // another thread for print every user in single way into textArea
                 Task<Void> task = new Task<Void>() {
                     @Override
                     protected Void call() throws Exception {
                         for(String user : users)
                             CheckList(user);
-
                         return null;
                     }
                 };
@@ -67,7 +58,7 @@ public class Controller {
                 es.shutdown();
 
 
-
+            // write all the available users into file available.txt
                 try{
                     File file = new File("available.txt");
                     FileWriter fileWriter = new FileWriter(file , true);
@@ -91,11 +82,10 @@ public class Controller {
         }
 
     }
-
-
+    
+    // Request to url and response with JSON and change it into String and add it into TextArea.
     public void CheckList(String username){
         String[] response = new String[2];
-
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create("https://api.twitter.com/graphql/P8ph10GzBbdMqWZxulqCfA/UserByScreenName?variables=%7B%22screen_name%22%3A%22"+username+"%22%2C%22withHighlightedLabel%22%3Atrue%7D"))
                 .setHeader("accept", "*/*").
@@ -115,23 +105,14 @@ public class Controller {
                 .thenApply(HttpResponse::body)
                 .join();
 
-
         if (response[0].contains("errors") && response[0].contains("message") && response[0].contains("Not found")) {
-//            response[1] = "available";
             Available.appendText(username+"\n");
         } else if (response[0].contains("created_at")) {
-//            response[1] = "unavailable";
             Taken.appendText(username+"\n");
         } else if (response[0].contains("User has been suspended.")) {
-//            response[1] = "suspended";
             Taken.appendText(username+"\n");
         }
 
-//        System.out.println(response[1]);
-
-
     }
-
-
 
 }
