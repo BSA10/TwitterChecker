@@ -3,6 +3,7 @@
 Check username
 
 
-#Steps
-1.make list and add it into list.txt file
-2.Run the program
+## Steps:
+
+ - make list and add it into list.txt file
+ - Run the program
