@@ -3,20 +3,23 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:controller="sample.Controller"
-        prefHeight="269.0" prefWidth="274.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="374.0" prefWidth="277.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
   <children>
-    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="182.0" prefWidth="294.0" VBox.vgrow="ALWAYS">
+    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="384.0" prefWidth="277.0" VBox.vgrow="ALWAYS">
          <children>
-            <TextArea fx:id="Taken" layoutX="14.0" layoutY="55.0" prefHeight="130.0" prefWidth="117.0" />
-            <TextArea fx:id="Available" layoutX="142.0" layoutY="55.0" prefHeight="130.0" prefWidth="117.0" />
-            <Label layoutX="53.0" layoutY="34.0" text="Taken" />
-            <Label layoutX="173.0" layoutY="33.0" text="Available" />
-            <Button fx:id="Start" onAction="#onClickChecker" layoutX="59.0" layoutY="204.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="168.0" text="Start" />
-            <Button fx:id="Stop" layoutX="59.0" layoutY="237.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="168.0" text="Stop" textFill="RED" />
+            <TextArea fx:id="Taken" layoutX="14.0" layoutY="162.0" prefHeight="130.0" prefWidth="117.0" />
+            <TextArea fx:id="Available" layoutX="142.0" layoutY="162.0" prefHeight="130.0" prefWidth="117.0" />
+            <Label layoutX="53.0" layoutY="141.0" text="Taken" />
+            <Label layoutX="173.0" layoutY="140.0" text="Available" />
+            <Button fx:id="Start" layoutX="59.0" layoutY="311.0" mnemonicParsing="false" onAction="#onClickChecker" prefHeight="26.0" prefWidth="168.0" text="Start" />
+            <Button fx:id="Stop" layoutX="59.0" layoutY="344.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="168.0" text="Stop" textFill="RED" />
+            <Label layoutX="11.0" layoutY="55.0" text="How many letter ?" />
+            <Button fx:id="MakeList" layoutX="107.0" layoutY="95.0" mnemonicParsing="false" onAction="#createList" text="Make list" />
+            <TextField fx:id="NumberOfLetter" layoutX="120.0" layoutY="51.0" prefHeight="25.0" prefWidth="38.0" />
          </children>
     </AnchorPane>
   </children>

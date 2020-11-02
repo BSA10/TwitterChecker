@@ -3,22 +3,24 @@ package sample;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import javafx.scene.paint.Stop;
 
 import java.io.*;
 import java.net.URI;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.Random;
+import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static sample.CheckerTwitter.CheckList;
 
-public class Controller {
+public class Controller implements Initializable {
 
     @FXML
     TextArea Available;
@@ -26,17 +28,34 @@ public class Controller {
     TextArea Taken;
 
     @FXML
-    Button Start;
+    Button Start,Stop;
 
+    @FXML
+    Button MakeList;
+
+    @FXML
+    TextField NumberOfLetter;
+
+
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        Available.setDisable(true);
+        Taken.setDisable(true);
+        Start.setDisable(true);
+        Stop.setDisable(true);
+    }
+    
+    
 
     @FXML
     public void onClickChecker(ActionEvent e) throws InterruptedException {
         if(e.getSource().equals(Start)){
             ArrayList<String> users = new ArrayList<>();
             String username = null;
-            String urlFile = "List.txt";
+            String urlFile = "list.txt";
 
-            try{
+            try {
                 // read the username from list.txt and add it into ArrayList
                 FileReader fileReader = new FileReader(urlFile);
                 BufferedReader in = new BufferedReader(fileReader);
@@ -47,8 +66,25 @@ public class Controller {
                 Task<Void> task = new Task<Void>() {
                     @Override
                     protected Void call() throws Exception {
-                        for(String user : users)
+                        for (String user : users)
                             CheckList(user);
+
+                        // write all the available users into file available.txt
+                        try {
+                            File file = new File("available.txt");
+                            FileWriter fileWriter = new FileWriter(file, true);
+                            BufferedWriter out = new BufferedWriter(fileWriter);
+
+                            String[] test = Available.getText().split("\\R");
+                            for (String user : test) {
+                                out.append(user).append("\n");
+                            }
+                            out.flush();
+                            out.close();
+                        } catch (Exception ex) {
+                            System.out.println("Error");
+                        }
+
                         return null;
                     }
                 };
@@ -58,31 +94,96 @@ public class Controller {
                 es.shutdown();
 
 
-            // write all the available users into file available.txt
-                try{
-                    File file = new File("available.txt");
-                    FileWriter fileWriter = new FileWriter(file , true);
-                    BufferedWriter out = new BufferedWriter(fileWriter);
 
-                    String [] test = Available.getText().split("\\R");
-                    for (String user : test) {
-                        out.append(user).append("\n");
-                    }
-                    out.flush();
-                    out.close();
-                }catch (Exception ex){
-                    System.out.println("Error");
+
+                }catch(Exception ex){
+                    ex.printStackTrace();
                 }
 
-            }catch (Exception ex){
-                ex.printStackTrace();
-            }
 
 
         }
 
     }
-    
+
+
+    // Create list from random character and make file.txt
+    @FXML
+    public void createList(ActionEvent e) throws InterruptedException{
+
+        if(e.getSource() == MakeList) {
+            Available.setDisable(false);
+            Taken.setDisable(false);
+            Start.setDisable(false);
+            Stop.setDisable(false);
+
+            int countTimeYouClick = 0;
+            Alert alert = new Alert(Alert.AlertType.WARNING, "There is list.txt exist do you want to clear it?", ButtonType.YES, ButtonType.NO);
+            if (new File("list.txt").exists()) {
+                alert.showAndWait();
+
+            }
+            if (alert.getResult() == ButtonType.NO) {
+                Alert alert2 = new Alert(Alert.AlertType.INFORMATION, "Make sure that the name of the file is \"list.txt\" , and press Start");
+                alert2.showAndWait();
+            }
+
+
+            if (alert.getResult() == ButtonType.YES || !(new File("list.txt").exists())) {
+                ArrayList<String> list = new ArrayList<>();
+                char[] temp = new char[Integer.parseInt(NumberOfLetter.getText())];
+                Random r = new Random();
+                String alphabet = "0123456789_qwertyuioplkjhgfdsazxcvbnm";
+
+                Task<Void> task = new Task<Void>() {
+                    @Override
+                    protected Void call() throws Exception {
+
+                        for (int i = 0; i < 500; i++) {
+                            for (int j = 0; j < Integer.parseInt(NumberOfLetter.getText()); j++) {
+                                temp[j] = (alphabet.charAt(r.nextInt(alphabet.length()))); // this code print random character from alphabet and put in temp so that can be group it later with ArrayList
+                            }
+                            temp[r.nextInt(temp.length)] = '_';
+                            list.add(String.copyValueOf(temp));
+                        }
+
+                        try {
+                            File file = new File("list.txt");
+                            FileWriter fw = new FileWriter(file, true);
+                            BufferedWriter out = new BufferedWriter(fw);
+                            for (String enterList : removeDuplicates(list)) {
+                                out.append(enterList).append("\n");
+                            }
+                            out.flush();
+                            out.close();
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+
+                        return null;
+                    }
+                };
+
+
+                ExecutorService es = Executors.newSingleThreadExecutor();
+                es.submit(task);
+                es.shutdown();
+
+                Alert Done = new Alert(Alert.AlertType.INFORMATION , "Done !");
+                Done.showAndWait();
+            }
+
+
+        }
+
+
+        }
+
+
+
+
+
+
     // Request to url and response with JSON and change it into String and add it into TextArea.
     public void CheckList(String username){
         String[] response = new String[2];
@@ -115,4 +216,27 @@ public class Controller {
 
     }
 
+    public static <T> ArrayList<T> removeDuplicates(ArrayList<T> list)
+    {
+
+        // Create a new ArrayList
+        ArrayList<T> newList = new ArrayList<T>();
+
+        // Traverse through the first list
+        for (T element : list) {
+
+            // If this element is not present in newList
+            // then add it
+            if (!newList.contains(element)) {
+
+                newList.add(element);
+            }
+        }
+
+        // return the new list
+        return newList;
+    }
+
+
+    
 }
